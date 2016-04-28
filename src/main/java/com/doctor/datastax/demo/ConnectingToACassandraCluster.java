@@ -1,5 +1,9 @@
 package com.doctor.datastax.demo;
 
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +27,16 @@ public class ConnectingToACassandraCluster {
     protected static Logger log = LoggerFactory.getLogger(ConnectingToACassandraCluster.class);
 
     public static void main(String[] args) {
-        String address = "127.0.0.1";
+        String address = "127.0.0.1:9042";
+        String[] hosts = address.split(",");
+        List<InetSocketAddress> inetAddress = new ArrayList<>(4);
+        for (String host : hosts) {
+            String[] hp = host.split(":");
+            InetSocketAddress inetSocketAddress = new InetSocketAddress(hp[0], Integer.parseInt(hp[1]));
+            inetAddress.add(inetSocketAddress);
+        }
 
-        try (Cluster cluster = Cluster.builder().addContactPoint(address).build();) {
+        try (Cluster cluster = Cluster.builder().addContactPointsWithPorts(inetAddress).build();) {
             Metadata metadata = cluster.getMetadata();
             log.info("Connected to cluster:{}", metadata.getClusterName());
 
