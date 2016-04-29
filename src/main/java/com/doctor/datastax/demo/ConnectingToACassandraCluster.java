@@ -18,6 +18,11 @@ import com.datastax.driver.core.Metadata;
  * 
  * @see http://docs.datastax.com/en/latest-java-driver/java-driver/quick_start/qsSimpleClientCreate_t.html
  * 
+ *      https://docs.datastax.com/en/cassandra/1.2/cassandra/security/security_config_native_authenticate_t.html
+ *      https://docs.datastax.com/en/cql/3.0/cql/cql_reference/create_user_r.html
+ *      https://docs.datastax.com/en/cql/3.0/cql/cql_reference/grant_r.html
+ * 
+ * 
  *      The complete code listing illustrates:
  *      connecting to a cluster
  *      retrieving metadata and printing it out
@@ -27,7 +32,9 @@ public class ConnectingToACassandraCluster {
     protected static Logger log = LoggerFactory.getLogger(ConnectingToACassandraCluster.class);
 
     public static void main(String[] args) {
-        String address = "127.0.0.1:9042";
+        String address = "dev015.qc.com:9042";
+        String username = "email";
+        String password = "email";
         String[] hosts = address.split(",");
         List<InetSocketAddress> inetAddress = new ArrayList<>(4);
         for (String host : hosts) {
@@ -36,7 +43,7 @@ public class ConnectingToACassandraCluster {
             inetAddress.add(inetSocketAddress);
         }
 
-        try (Cluster cluster = Cluster.builder().addContactPointsWithPorts(inetAddress).build();) {
+        try (Cluster cluster = Cluster.builder().addContactPointsWithPorts(inetAddress).withCredentials(username, password).build();) {
             Metadata metadata = cluster.getMetadata();
             log.info("Connected to cluster:{}", metadata.getClusterName());
 
